@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+<a href="/logout" role="button"><button class="btn logout-button">LogOut</button></a>
+<div class="dropdown">
+    <button class="dropbtn">Profile</button>
+    <div class="dropdown-content">
+      <a href="/<%= currentuser %> "><%= currentuser %></a>
+    </div>
+</div>
+
+<div class="centered">
+    <input id="searchbar" onkeyup="search_users()" type="text"
+        name="search" placeholder="Search Users">
+    <input id="filter" type="text" name="filter" onkeyup="search_users()" placeholder="department">
+        <div class="centered">
+          <div class="container">
+            <h2 class="dashboard-header">All users</h2>
+            <div id="list">
+              <% users.forEach(function(user){ %>
+                  <span class="user-list"><a href="/<%= user.username%>" class="la" role="button"><button class="list"><%= user.username %></button>
+                  <span class="dep-list"><%= user.department%></span>
+                  </a></span>
+              <%})%>
+            </div>
+          </div>
+        </div>    
+
+</div>
+
+<script>
+ function search_users() {
+    let input = document.getElementById('searchbar').value;
+    let filter = document.getElementById('filter').value;
+    input=input.toLowerCase();
+    filter=filter.toLowerCase();
+    document.querySelector("h2").style.display = "none";
+    if(input == ""){
+     document.querySelector("h2").style.display = "block";
+    }
+    let x = document.getElementsByClassName('user-list');
+    let y = document.getElementsByClassName('dep-list');
+    for (i = 0; i < x.length; i++) { 
+        if (!x[i].innerHTML.toLowerCase().includes(input) || !y[i].innerHTML.toLowerCase().includes(filter)) {
+            x[i].style.display="none";
+        }
+        else {
+            x[i].style.display="list-item";                 
+        }
+    }
+ }
+</script>
+
+
+<%- include('partials/footer') %>
