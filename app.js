@@ -6,7 +6,7 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 // const bcrypt = require("bcrypt");
 // const saltRounds = 12;
-var commentUser = "";
+
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
@@ -16,7 +16,7 @@ const _ = require("lodash");
 const path = require('path');
 const fs = require("fs");
 const multer = require("multer");
-var activeUser = "";
+
 
 const search_u = require(__dirname + "/searchbar.js"); 
 
@@ -53,7 +53,8 @@ var storage = multer.diskStorage({
  
 var upload = multer({ storage: storage }).single('image');
 
-mongoose.connect("mongodb+srv://admin-bhoopesh:bjioknmlp@cluster0.s6slsoh.mongodb.net/userDB", {useNewUrlParser: true});
+// mongoose.connect("mongodb+srv://admin-bhoopesh:bjioknmlp@cluster0.s6slsoh.mongodb.net/userDB", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 
 const userSchema = new mongoose.Schema({
     username: String,
@@ -120,7 +121,7 @@ app.get("/register",function(req,res){
 app.get("/dashboard",function(req,res){
     // let user = req.user.username;
     const context = req.cookies.context;
-    res.clearCookie("context", { secure: true });
+    // res.clearCookie("context", { secure: true });
     if(req.isAuthenticated()){
         User.find({"username": {$ne: null}}, function(err,foundUsers){
             if(err){
@@ -128,7 +129,7 @@ app.get("/dashboard",function(req,res){
             }
             else{
              if(foundUsers){
-                res.render("dashboard", {currentuser: activeUser, users: foundUsers});
+                res.render("dashboard", {currentuser: context, users: foundUsers});
              }
             }
         });
@@ -140,16 +141,21 @@ app.get("/dashboard",function(req,res){
 });
 
 app.get("/secrets", function(req,res){
+    const context = req.cookies.context;
+    const context1 = req.cookies.context1;
+
     if(req.isAuthenticated()){
         
-        if(List.findOne({name: commentUser}, function(err,foundList){
+        // User.find({name: })
+        
+        if(List.findOne({name: context1}, function(err,foundList){
             if(err){
                 console.log(err);
             }
             if(foundList.length != 0){
                 // console.log(foundList.comments);
                 
-                res.render("secrets",{username: commentUser, listItem: foundList.comments});
+                res.render("secrets",{username: context1, listItem: foundList.comments});
             }
         }));
 
@@ -193,13 +199,22 @@ app.get("/submit", function(req,res){
 
 app.get("/photos", function(req,res){
 
-    Comment.find({for: commentUser , by: activeUser}, function(err,foundList){
-
-        if(err) throw err;
-        else{
-          res.render("photos",  { items: foundList , user: commentUser } );
-        }
-    });
+    if(req.isAuthenticated()){
+        const context = req.cookies.context;
+        const context1 = req.cookies.context1;
+    
+        Comment.find({for: context1 , by: context}, function(err,foundList){
+    
+            if(err) throw err;
+            else{
+              res.render("photos",  { items: foundList , user: context1 } );
+            }
+        });
+    }
+    else{
+        res.redirect("/login");
+    }
+    
 
 });
 
@@ -215,49 +230,65 @@ app.get("/photos", function(req,res){
 //  });
 
 app.get("/:userName",function(req,res){
-    const username = _.capitalize(req.params.userName);
-    commentUser = username;
-    console.log(username);
-    // res.redirect("/secrets");
-    // res.render("secrets",{username : commentUser});
-    if(List.findOne({name: username}, function(err,foundList){
-        if(!err){
-            if(!foundList){
-                const list = new List({
-                    name : username,
-                    comments: defaultItems
-                });
-                // list.save();
-                list.save(function(err){
 
-                    if (!err){
-                        res.redirect("/secrets");
-                    }
-
-                });
+    if(req.isAuthenticated()){
+        const username = _.capitalize(req.params.userName);
+        // commentUser = username;
+    
+        res.clearCookie("context1", { secure: true });
+    
+    
+        console.log(username);
+        // res.redirect("/secrets");
+        // res.render("secrets",{username : commentUser});
+        if(List.findOne({name: username}, function(err,foundList){
+           res.cookie("context1", username, {secure: true });
+            if(!err){
+                if(!foundList){
+                    const list = new List({
+                        name : username,
+                        comments: defaultItems
+                    });
+                    // list.save();
+                    list.save(function(err){
+    
+                        if (!err){
+                            res.redirect("/secrets");
+                        }
+    
+                    });
+                }
+                else{
+                    // res.render("secrets",{username: foundList.name, listItem: foundList.comments});
+                    res.redirect("/secrets");
+                }
+    
             }
-            else{
-                res.render("secrets",{username: foundList.name, listItem: foundList.comments});
-            }
-
-        }
-    }));
-
+        }));
+    }
+    else{
+        res.redirect("/login");
+    }
     
 });
 
 
 
 app.post("/secrets", function(req,res){
+    if(req.isAuthenticated()){
+
     const submittedComment = req.body.comment;
+
+    const context =  req.cookies.context;
+    const context1 = req.cookies.context1;
 
     const comment = new Comment({
         comment: submittedComment,
-        by: activeUser,
-        for: commentUser 
+        by: context,
+        for: context1 
     });
 
-    List.findOne({name: commentUser}, function(err,foundList){
+    List.findOne({name: context1}, function(err,foundList){
         foundList.comments.push(comment);
         foundList.save(function(err){
             if(!err){
@@ -265,7 +296,10 @@ app.post("/secrets", function(req,res){
             }
         });
     });
-
+    }
+    else{
+        res.redirect("/login");
+    }
     // res.render("secrets", {username : commentUser});
     // User.findById(req.user.id, function(err, foundUser){
     //     if(err){
@@ -288,10 +322,13 @@ app.post("/delete", function(req,res){
     var delcomm = req.body.comm;
     // var obj = JSON.parse(deleteComment);
     console.log(deleteComment);
+
+    const context = req.cookies.context;
+    const context1 = req.cookies.context1;
     
 
-    if(activeUser == deleteComment){
-         List.findOne({name: commentUser}, function(err,foundList){
+    if(context == deleteComment){
+         List.findOne({name: context1}, function(err,foundList){
             foundList.comments.forEach( element =>{
                if(element.by == deleteComment && element.comment == delcomm){
                  var index = foundList.comments.indexOf(element);
@@ -336,10 +373,13 @@ app.post("/uploadphoto",upload,(req,res)=>{
     var img = fs.readFileSync(req.file.path);
     var encode_img = img.toString('base64');
 
+    const context = req.cookies.context;
+    const context1 = req.cookies.context1;
+
     var obj = {
         comment: "",
-        by: activeUser,
-        for: commentUser,
+        by: context,
+        for: context1,
         img: {
             data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)),
             contentType: 'image/png'
@@ -371,8 +411,9 @@ app.post("/register", function(req,res){
                 }
                 else{
                     passport.authenticate("local")(req,res, function(){
-                        activeUser = req.body.username;
-                        res.cookie("context", activeUser, {secure: true });
+                        // activeUser = req.body.username;
+                        res.clearCookie("context", { secure: true });
+                        res.cookie("context", req.body.username, {secure: true });
                         res.redirect("/dashboard");
                     });
                 }
@@ -402,8 +443,9 @@ app.post("/login", function(req,res){
         }
         else{
             passport.authenticate("local")(req,res, function(){
-                activeUser = req.body.username;
-                res.cookie("context", activeUser, { secure: true });
+                // activeUser = req.body.username;
+                res.clearCookie("context", { secure: true });
+                res.cookie("context", req.body.username, { secure: true });
                 res.redirect("/dashboard");
 
             });
