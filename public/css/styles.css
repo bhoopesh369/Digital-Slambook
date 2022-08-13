@@ -1,10 +1,25 @@
 
 body {
   font-family: Helvetica, sans-serif;
-  background-image: -webkit-linear-gradient(65deg, #A683E3 50%, #eff4ff 50%);
-  min-height: 900px;
 
+	background: linear-gradient(-90deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background-size: 400% 400%;
+	animation: gradient 25s ease infinite;
+	height: 90vh;
 }
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
 a{
   text-decoration: none;
 }
@@ -128,8 +143,7 @@ h1{
 /* Dropdown button */
 
 .dropbtn {
-  background-color: #A683E3;
-  color: white;
+  background-color: rgb(242, 223, 188);
   padding: 16px;
   font-size: 16px;
   border: solid;
@@ -145,14 +159,14 @@ h1{
 .dropdown {
   position: absolute;
   display: inline-block;
-  right: 12px;
+  left: 12px;
   top: 13px
 }
 
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #A683E3;
+  background-color: rgb(242, 223, 188);
   border-radius: 5px;
   min-width: 100px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -166,21 +180,29 @@ h1{
   display: block;
 }
 
-.dropdown-content a:hover {background-color: #c8b3ed;}
+.dropdown-content a:hover {
+  background-color: white;
+
+}
 
 .dropdown:hover .dropdown-content {display: block;}
-.dropdown:hover .dropbtn {background-color: #b599e6;}
+.dropdown:hover .dropbtn {
+  background-color: rgb(242, 223, 188);
+}
 
 .logout-button{
+  position: absolute;
+  right: 12px;
+  top: 13px;
   width: 90px;
   height: 30px;
-  background: #bfb2d7;
+  background-color: rgb(242, 223, 188);
   margin: 5px auto 0px;
   font-size: 0.9rem;
 }
 
 .list{
-  background-color: #c5b2e6;
+  background-color: rgb(242, 223, 188);
   border: none;
   font-size: 1.1rem;
   font-family: 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
@@ -192,6 +214,7 @@ h1{
 
 .dashboard-header{
   margin-top: 0px;
+  margin-bottom: 5px;
 }
 
 .comment-box{
@@ -221,7 +244,7 @@ h1{
 }
 
 .delete{
-  background-color: #cdbaee;
+  background-color: rgb(242, 223, 188);
   position: relative;
   left: 235px;
   top: 23.5px;
@@ -236,7 +259,7 @@ h1{
 .del-btn{
   position: relative;
   bottom: 23px;
-  background-color: #bda6e7;
+  background-color: rgb(242, 223, 188);
   border-radius: 5px;
 }
 
@@ -264,6 +287,7 @@ h1{
   border: solid;
   border-color: #130028;
   border-width: 3px;
+  margin-top: 50px;
 }
 #searchbar:hover{
   box-shadow: 1px 2px 15px rgb(136, 136, 136);
@@ -283,11 +307,13 @@ h1{
 
 #list{
  font-size:  1.5em;
+ 
 }
 
 .user-list{
  display: list-item;    
  margin-bottom: 7px;
+ 
 } 
 
 .la{
@@ -295,7 +321,7 @@ h1{
   height: 30px;
   cursor: pointer;
   display: block;
-  background-color: #c5b2e6;
+  background-color: rgb(242, 223, 188);
   margin: auto;
   border: solid;
   border-radius: 10px;
@@ -303,7 +329,7 @@ h1{
 }
 
 .la:hover{
-  background-color: #cdbfe7;
+  background-color: rgb(239, 226, 204);
   box-shadow: 3px 2px 10px rgb(97, 97, 97);
 }
 
@@ -397,8 +423,8 @@ ul{
   border-radius: 4px;
   border: 2px solid;
   width: 60px;
-  top: 108px;
-  left: 958px;
+  top: 123px;
+  left: 965px;
   font-size: 0.8rem;
    font-family: Verdana, sans-serif;
    -webkit-transition: width 0.1s ease-in-out;
@@ -430,4 +456,53 @@ ul{
 .list-unstyled{
   display: none;
 }
+
+.depp{
+  margin-top: 0;
+}
+
+.slambook-header{
+  font-family: 'Rubik Moonrocks', cursive;
+  color: black;
+  font-weight: 500;
+  font-size: 2.5rem;
+  position: absolute;
+  margin: auto;
+  top : 30px;
+  left: 665px;
+}
+
+.image-b{
+  /* margin-top: 30px; */
+  margin-bottom: 0px;
+  height: 30px;
+  width: 100px;
+  border: solid black;
+  border-radius: 5px;
+  background-color: rgb(242, 223, 188);
+}
+
+.image-b:hover{
+  background-color: rgb(233, 227, 217);
+}
+
+.sub{
+  margin-bottom: 27px;
+}
+
+.dash{
+  position: absolute;
+  left: 12px;
+  top: 13px;
+  width: 90px;
+  height: 30px;
+  background-color: rgb(242, 223, 188);
+  margin: 5px auto 0px;
+  font-size: 0.9rem;
+}
+
+
+
+
+
 

@@ -53,19 +53,15 @@ var storage = multer.diskStorage({
  
 var upload = multer({ storage: storage }).single('image');
 
-mongoose.connect("mongodb+srv://admin-bhoopesh:bjioknmlp@cluster0.s6slsoh.mongodb.net/userDB", {useNewUrlParser: true});
-// mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+// mongoose.connect("mongodb+srv://admin-bhoopesh:bjioknmlp@cluster0.s6slsoh.mongodb.net/userDB", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 
 const userSchema = new mongoose.Schema({
     username: String,
     password: String,
     department: String,
+    email: String,
     secret: String
-    // img:
-    // {
-    //     data: Buffer,
-    //     contentType: String
-    // }
 });
 
 const commentSchema = new mongoose.Schema({
@@ -129,7 +125,16 @@ app.get("/dashboard",function(req,res){
             }
             else{
              if(foundUsers){
-                res.render("dashboard", {currentuser: context, users: foundUsers});
+                if(User.findOne({username: context}, function(err,foundName){
+
+                    if(err){
+                        console.log(err);
+                    }
+                    else{
+                        res.render("dashboard", {currentuser: context, users: foundUsers, depp: foundName.department});
+                    }
+                }));
+
              }
             }
         });
@@ -146,16 +151,28 @@ app.get("/secrets", function(req,res){
 
     if(req.isAuthenticated()){
         
-        // User.find({name: })
-        
         if(List.findOne({name: context1}, function(err,foundList){
             if(err){
                 console.log(err);
             }
             if(foundList.length != 0){
                 // console.log(foundList.comments);
+                if(User.findOne({username: context1}, function(err,foundName){
+
+                    if(err){
+                        console.log(err);
+                    }
+                    else{
+                        if( _.capitalize(context) == _.capitalize(context1)){
+                            res.render("profile",{username: context1, listItem: foundList.comments, depp: foundName.department});
+                        }
+                        else{
+                            res.render("secrets",{username: context1, listItem: foundList.comments, depp: foundName.department, mailto: foundName.email});
+                        }
+
+                    }
+                }));
                 
-                res.render("secrets",{username: context1, listItem: foundList.comments});
             }
         }));
 
@@ -232,13 +249,12 @@ app.get("/photos", function(req,res){
 app.get("/:userName",function(req,res){
 
     if(req.isAuthenticated()){
-        const username = _.capitalize(req.params.userName);
+        const username = req.params.userName;
         // commentUser = username;
     
         res.clearCookie("context1", { secure: true });
     
-    
-        console.log(username);
+        // console.log(username);
         // res.redirect("/secrets");
         // res.render("secrets",{username : commentUser});
         if(List.findOne({name: username}, function(err,foundList){
@@ -349,23 +365,6 @@ app.post("/delete", function(req,res){
     }
 
     // List.findOne({name: commentUser}, function (err, foundList) {
-
-    //         if(err){
-    //            console.log(err);
-    //         }else{
-    //         foundList.comments.forEach( element =>{
-    //            if(element.comment == deleteComment){
-    //              foundList.comments.pop(element);
-    //              foundList.save(function(err){
-    //                 if(!err){
-    //                     res.redirect("/secrets");
-    //                 }
-    //              });
-    //            }
-    //         });
-    //        }
-    // });
-
 });
 
 
@@ -404,7 +403,7 @@ app.post("/register", function(req,res){
     User.findOne({username: req.body.username}, function (err, foundList) {
 
         if(!foundList){
-            User.register({username: req.body.username, department: req.body.department}, req.body.password, function(err, user){
+            User.register({username: req.body.username, department: req.body.department, email: req.body.email}, req.body.password, function(err, user){
                 if(err){
                    console.log(err);
                    res.redirect("/register"); 

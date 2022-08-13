@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+<a href="/dashboard" role="button"><button class="btn dash">Dashboard</button></a>
+<div class="centered">
+  <div class="container">
+
+    <h1 class="dashboard-header" >Hi <%= username %> </h1>
+    <h3 class="depp"><%= depp %> </h3>
+
+
+    <% listItem.forEach(element => { %>
+       <%if(element.comment == "Comment about your memories with me , Describe Me in your own words"){%>
+          <h2>Comments about you</h2>
+       <% }else{ %>
+          <div class="comment-box">
+            <p class="comment-theme"><%=element.comment %></p>
+            <form action="/delete" method="POST">
+              <button class="delete" type="submit" name="com" value='<%= element.by %>' >🗑️</button>
+              <input type="hidden" name="comm" value='<%= element.comment %>'></input>
+            </form>
+            <a class="by-tag" href="/<%= element.by %> "><button class="del-btn">- <%=element.by%></button></a>
+          </div>
+       <% } %>
+    <%});%>
+
+    <p></p>
+    <hr>
+
+    <a href="/photos"><button>Images</button></a>
+
+  </div>
+</div>
+
+
+<%- include('partials/footer') %>
